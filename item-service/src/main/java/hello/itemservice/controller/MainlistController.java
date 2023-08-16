@@ -28,15 +28,15 @@ public class MainlistController {
         String result = "";
 
         if (values.equals("first"))
-            result = "/mainlist/firstpage";
+            result = "mainlist/firstpage";
         else if (values.equals("second"))
-            result = "/mainlist/secondpage";
+            result = "mainlist/secondpage";
         else if (values.equals("third"))
-            result = "/mainlist/thirdpage";
+            result = "mainlist/thirdpage";
         else if (values.equals("four"))
-            result = "/mainlist/fourthpage";
+            result = "mainlist/fourthpage";
         else
-            result = "/mainlist/fifthpage";
+            result = "mainlist/fifthpage";
 
         return result;
     }
