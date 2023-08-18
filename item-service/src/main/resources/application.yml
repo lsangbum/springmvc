@@ -1,0 +1,14 @@
+server:
+    port: 8181
+
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://database-1.cspipmzdubgb.ap-northeast-2.rds.amazonaws.com:3306/mydb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+        username: admin
+        password: Tkfkdgo1!!
+
+mybatis:
+    mapper-locations: mapper/*.xml
+
+
