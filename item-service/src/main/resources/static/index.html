@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>이상범의 AWS jenkins docker 여행 메뉴 리스트!!!</title>
+    <!-- jquery CDN -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <!-- 부트스트랩 CDN -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- 부트스트랩 JS 및 jQuery -->
+    <!-- 부트스트랩 JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script th:inline="javascript">
 
         $(document).ready(function() {
@@ -19,14 +22,14 @@
 
             $.ajax({
                 type: "POST",
-                url: "/login/loginChk",
+                url: "/user/loginChk",
                 data: {
                     "email": $("#email").val(),
                     "pwd": $("#pwd").val()
                 },
                 success: function(data) {
                     if(data.result == 1) {
-                        location.href="/login/view";
+                        location.href="/user/view";
                     }else {
                         alert("일치하는 데이터가 없습니다.");
                         $("#email").val("");
@@ -41,6 +44,76 @@
                 }
             })
         }
+        /* 회원가입 */
+        function join() {
+
+            if(!!!$("#userid").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#userid").focus();
+                return false;
+            }
+            if(!!!$("#userpwd").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#userpwd").focus();
+                return false;
+            }
+            if(!!!$("#username").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#username").focus();
+                return false;
+            }
+            if(!!!$("#birth").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#birth").focus();
+                return false;
+            }
+            if(!!!$("#phone").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#phone").focus();
+                return false;
+            }
+            if(!!!$("#zipcode").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#zipcode").focus();
+                return false;
+            }
+            if(!!!$("#address").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#address").focus();
+                return false;
+            }
+
+            let userInfo = {
+                "userId"    : $("#userid").val(),
+                "userPwd"   : $("#userpwd").val(),
+                "userName"  : $("#username").val(),
+                "userBirth"     : $("#birth").val(),
+                "userPhone"     : $("#phone").val(),
+                "userZipcode"   : $("#zipcode").val(),
+                "userAddress"   : $("#address").val()
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/user/join",
+                data: JSON.stringify(userInfo),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function(data) {
+                    if(data == 1) {
+                        $("#successModal").modal('show');
+                        $("#signupModal").modal("hide");
+                    }else {
+                        $("#failModal").modal('show');
+                    }
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            })
+
+
+        }
     </script>
 </head>
 <body class="bg-light">
@@ -52,13 +125,112 @@
                         <h5 class="card-title text-center">LOGIN</h5>
                         <div class="form-group">
                             <label for="email">ID</label>
-                            <input type="text" class="form-control" id="email" name="email" maxlength="25" minlength="3" placeholder="plase 3 ~ 25" required>
+                            <input type="text" class="form-control" id="email" name="email" maxlength="25" minlength="3" placeholder="email 3 ~ 25" required>
                         </div>
                         <div class="form-group">
                             <label for="pwd">PWD</label>
-                            <input type="password" class="form-control" id="pwd" name="pwd" maxlength="25" minlength="3" placeholder="plase 3 ~ 25" required>
+                            <input type="password" class="form-control" id="pwd" name="pwd" maxlength="25" minlength="3" placeholder="pwd 3 ~ 25" required>
                         </div>
                         <button type="button" onclick="loginBtn()" class="btn btn-success btn-block">Login</button>
+                        <button type="button" class="btn btn-success btn-block" data-bs-toggle="modal" data-bs-target="#signupModal">Join</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 회원가입 모달 -->
+        <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="signupModalLabel">회원가입</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="userid" class="form-label">아이디</label>
+                                <input type="text" class="form-control" id="userid">
+                            </div>
+                            <div class="mb-3">
+                                <label for="userpwd" class="form-label">비밀번호</label>
+                                <input type="password" class="form-control" id="userpwd">
+                            </div>
+                            <div class="mb-3">
+                                <label for="username" class="form-label">이름</label>
+                                <input type="text" class="form-control" id="username">
+                            </div>
+                            <div class="mb-3">
+                                <label for="birth" class="form-label">생년월일</label>
+                                <input type="date" class="form-control" id="birth">
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">핸드폰번호</label>
+                                <input type="tel" class="form-control" id="phone">
+                            </div>
+                            <div class="mb-3">
+                                <label for="zipcode" class="form-label">우편번호</label>
+                                <input type="text" class="form-control" id="zipcode">
+                            </div>
+                            <div class="mb-3">
+                                <label for="address" class="form-label">주소</label>
+                                <input type="text" class="form-control" id="address">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="join()">join</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 가입 성공 모달 -->
+        <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="successModalLabel">🙌</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        회원가입 성공
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 가입 실패 모달 -->
+        <div class="modal fade" id="failModal" tabindex="-1" aria-labelledby="failModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="failModalLabel">🤯</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        회원가입 실패
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 필수 입력 값 모달 -->
+        <div class="modal fade" id="inputTagModal" tabindex="-1" aria-labelledby="inputTagModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="inputTagModalLabel">✍</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        미입력 항목이 있습니다.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
                     </div>
                 </div>
             </div>

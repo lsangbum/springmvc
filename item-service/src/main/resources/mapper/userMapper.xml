@@ -1,13 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="hello.itemservice.mapper.LoginMapper">
+<mapper namespace="hello.itemservice.mapper.UserMapper">
+
+    <insert id="insertJoin" parameterType="hello.itemservice.vo.ReqUserInfo">
+        INSERT  INTO    USER
+        (
+           UID
+        ,  PWD
+        ,  NAME
+        ,  BIRTH
+        ,  PHONE
+        ,  ZIPCODE
+        ,  ADDRESS
+        )
+        VALUES
+        (
+            #{userId}
+        ,   #{userPwd}
+        ,   #{userName}
+        ,   #{userBirth}
+        ,   #{userPhone}
+        ,   #{userZipcode}
+        ,   #{userAddress}
+        )
+    </insert>
 
     <select id="loginChk" parameterType="String" resultType="map">
         SELECT    CASE    WHEN
                               EXISTS (
                                       SELECT	1
-                                      FROM	    TEST
-                                      WHERE	    ID	=	#{email}
+                                      FROM	    USER
+                                      WHERE	    UID	=	#{email}
                                       AND	    PWD	=	#{pwd}
                                      )
                           THEN	1
