@@ -8,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 @Controller
@@ -38,13 +40,18 @@ public class UserController {
      */
     @PostMapping("/loginChk")
     @ResponseBody
-    public Map loginChk(String email, String pwd) throws Exception {
+    public Map loginChk(String email, String pwd, HttpServletRequest request) throws Exception {
+        HttpSession session = request.getSession();
+        session.setAttribute("userId", email);
         return userService.loginChk(email, pwd);
     }
 
     @GetMapping("/view")
-    public String view(Model model) throws Exception {
+    public String view(Model model, HttpServletRequest request) throws Exception {
+        HttpSession session = request.getSession();
         model.addAttribute("list", userService.getBoard());
+        System.out.println(userService.getBoard().get(0).toString());
+        model.addAttribute("userId", session.getAttribute("userId"));
         return "view/view1";
     }
 

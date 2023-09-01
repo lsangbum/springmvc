@@ -5,14 +5,35 @@
     <insert id="setWrite" parameterType="String">
         INSERT INTO BOARD
         (
-            title
-        ,   content
+            TITLE
+        ,   CONTENT
+        ,   UID
+        ,   DATE
         )
         VALUE
         (
             #{title}
         ,   #{content}
+        ,   #{uid}
+        ,   now()
         )
     </insert>
+
+    <update id="updateLetter" parameterType="hello.itemservice.vo.BoardList">
+        UPDATE  BOARD
+        SET     TITLE       = #{title}
+            ,   CONTENT     = #{content}
+            ,   MODIFYDATE  = now()
+        WHERE   UID         = #{uid}
+        AND     DATE        = #{date}
+    </update>
+
+    <delete id="deleteLetter" parameterType="hello.itemservice.vo.BoardList">
+        DELETE  FROM    BOARD
+        WHERE   TITLE   = #{title}
+        AND     UID     = #{uid}
+        AND     DATE    = #{date}
+    </delete>
+
 
 </mapper>
