@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hello.itemservice.mapper.MailSenderMapper">
+
+    <insert id="sendMail" parameterType="hello.itemservice.vo.MailInfo">
+        INSERT INTO SENDMAIL
+        (
+            TITLE
+        ,   RECEIVER
+        ,   CONTENT
+        ,   DATE
+        )
+        VALUE
+        (
+            #{title}
+        ,   #{receiver}
+        ,   #{content}
+        ,   DATE_ADD(now(), INTERVAL 9 HOUR)
+        )
+    </insert>
+
+</mapper>

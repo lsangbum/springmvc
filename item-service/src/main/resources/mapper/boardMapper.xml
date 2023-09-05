@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hello.itemservice.mapper.BoardMapper">
+
+    <insert id="setWrite" parameterType="String">
+        INSERT INTO BOARD
+        (
+            TITLE
+        ,   CONTENT
+        ,   UID
+        ,   DATE
+        )
+        VALUE
+        (
+            #{title}
+        ,   #{content}
+        ,   #{uid}
+        ,   now()
+        )
+    </insert>
+
+    <update id="updateLetter" parameterType="hello.itemservice.vo.BoardList">
+        UPDATE  BOARD
+        SET     TITLE       = #{title}
+            ,   CONTENT     = #{content}
+            ,   MODIFYDATE  = now()
+        WHERE   UID         = #{uid}
+        AND     DATE        = #{date}
+    </update>
+
+    <delete id="deleteLetter" parameterType="hello.itemservice.vo.BoardList">
+        DELETE  FROM    BOARD
+        WHERE   TITLE   = #{title}
+        AND     UID     = #{uid}
+        AND     DATE    = #{date}
+    </delete>
+
+
+</mapper>

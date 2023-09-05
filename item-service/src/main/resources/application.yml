@@ -1,0 +1,25 @@
+server:
+    port: 8181
+
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://database-1.cspipmzdubgb.ap-northeast-2.rds.amazonaws.com:3306/mydb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+        username: admin
+        password: Tkfkdgo1!!
+    mail:
+        host: smtp.gmail.com
+        port: 587
+        username: 'c23tiger@gmail.com'  #발신자 이메일
+        password: 'cvodjgxwiydeauxy'    #발신자 pwd
+        properties:
+          mail:
+              smtp:
+                  auth: true
+                  starttls:
+                      enable: true
+
+mybatis:
+    mapper-locations: mapper/*.xml
+
+
