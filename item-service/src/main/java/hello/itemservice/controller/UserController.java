@@ -22,6 +22,18 @@ public class UserController {
 
     /**
      * @writer  이상범
+     * @date    230905
+     * @script  아이디중복체크
+     * @return  성공 1 실패 0
+     */
+    @PostMapping("/check/userid")
+    @ResponseBody
+    public Map getCheckUserId(String userId)throws Exception {
+        return userService.getCheckUserId(userId);
+    }
+
+    /**
+     * @writer  이상범
      * @date    230831
      * @script  회원가입
      * @return  성공 1 실패 0

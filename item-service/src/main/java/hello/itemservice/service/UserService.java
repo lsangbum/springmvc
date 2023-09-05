@@ -29,4 +29,8 @@ public class UserService {
     public Integer insertJoin(ReqUserInfo userInfo) throws SQLException {
         return userMapper.insertJoin(userInfo);
     }
+
+    public Map getCheckUserId(String userId) throws SQLException {
+        return userMapper.getCheckUserId(userId);
+    }
 }
