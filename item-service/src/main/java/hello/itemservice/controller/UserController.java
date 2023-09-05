@@ -46,6 +46,12 @@ public class UserController {
         return userService.loginChk(email, pwd);
     }
 
+    /**
+     * @writer  이상범
+     * @date    230830
+     * @script  로그인 아이디세션저장 후 페이지이동
+     * @return  view/view1
+     */
     @GetMapping("/view")
     public String view(Model model, HttpServletRequest request) throws Exception {
         HttpSession session = request.getSession();
@@ -55,6 +61,26 @@ public class UserController {
         return "view/view1";
     }
 
+    /**
+     * @writer  이상범
+     * @date    230905
+     * @script  로그아웃 세션삭제
+     * @return  index
+     */
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);    //session 자체가 null을 허용하기에 null 체크를 해줌
+        if (session != null) {
+            session.invalidate();   //세션의 모든 속성을 삭제
+        }
+        return "redirect:/";
+    }
+
+    /**
+     * 확인 후 삭제
+     * @return
+     * @throws Exception
+     */
     @GetMapping("/board/write")
     public String write() throws Exception {
         return "view/boardwrite";

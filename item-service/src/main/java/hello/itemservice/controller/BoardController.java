@@ -47,6 +47,4 @@ public class BoardController {
     public Integer deleteLetter(@RequestBody BoardList boardList) throws Exception  {
         return boardService.deleteLetter(boardList);
     }
-
-
 }
