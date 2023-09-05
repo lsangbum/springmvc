@@ -14,6 +14,11 @@
 
         let createDate;
 
+        /* 로그아웃 */
+        function logout() {
+            location.href="/user/logout"
+        }
+
         /* 뒤로가기 */
         function goBack() {
             window.history.back();
@@ -128,12 +133,64 @@
             }
         }
 
+        /* 메일발송 모달 */
+        function getSendMail() {
+            $("#sendMailModal").modal("show");
+        }
+        /* 메일발송 */
+        function sendMail() {
+
+            if(confirm("발송하시겠습니까 ?")) {
+                showLoading();
+                $.ajax({
+                    type: "POST",
+                    url: "/mail/send",
+                    data: {
+                        "receiver"  : $("#receiver").val(),
+                        "title"     : $("#mailTitle").val(),
+                        "content"   : $("#mailContent").val(),
+                        "uid"       : [[${userId}]],
+                    },
+                    success: function(data) {
+                        hideLoading();
+                        if(data == 1) {
+                            alert("발송완료")
+                            location.reload(true);
+                        }else {
+                            alert("발송실패");
+                        }
+                    },
+                    error: function (data) {
+                        hideLoading();
+                        console.log(data);
+                        alert("같은 증상이 반복되는 경우 이상범한테 전화주세요.");
+                    },
+                })
+            }
+        }
+
+        /* 스핀 이미지 켜기 */
+        function showLoading() {
+            document.getElementById("loadingContainer").classList.remove("d-none");
+        }
+
+        /* 스핀 이미지 끄기 */
+        function hideLoading() {
+            document.getElementById("loadingContainer").classList.add("d-none");
+        }
+
     </script>
 </head>
 <body class="bg-light">
     <div class="container mt-5">
-        <h1 class="mb-4">게시판</h1>
-        <div>사용자 : [[${userId}]]</div>
+        <h1 class="mb-4">
+            <span>게시판</span>
+            <button type="button" class="btn btn-danger float-right" onclick="logout()">로그아웃</button>
+        </h1>
+
+        <div>
+            <span>사용자 : [[${userId}]]</span>
+        </div>
         <!-- 게시물 목록 -->
         <table class="table">
             <thead>
@@ -161,7 +218,8 @@
             </tbody>
         </table>
         <button type="button" class="btn btn-success" onclick="getWrite()">글쓰기</button>
-        <button type="button" class="btn btn-success" onclick="goBack()">뒤로가기</button>
+        <button type="button" class="btn btn-success" onclick="getSendMail()">메일 발송</button>
+        <button type="button" class="btn btn-success float-right" onclick="goBack()">뒤로가기</button>
     </div>
 
     <!--게시글 확인 모달-->
@@ -219,6 +277,45 @@
                 </div>
                 <textarea class="modal-body" id="updateModalBody"></textarea>
                 <button type="button" class="btn btn-primary" onclick="updateLetter()">수정</button>
+            </div>
+        </div>
+    </div>
+    <!-- 메일 발송 모달 -->
+    <div class="modal fade" id="sendMailModal" tabindex="-1" role="dialog" aria-labelledby="sendMailModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sendMailModalLabel">메일 발송</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="title">받는이 주소</label>
+                            <input type="text" class="form-control" id="receiver" placeholder="이메일 주소를 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="title">제목</label>
+                            <input type="text" class="form-control" id="mailTitle" placeholder="제목을 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label for="content">내용</label>
+                            <textarea class="form-control" id="mailContent" rows="5" placeholder="내용을 입력하세요"></textarea>
+                        </div>
+                    </form>
+                    <!-- 로딩 아이콘을 표시할 위치 -->
+                    <div id="loadingContainer" class="d-none justify-content-center align-items-center">
+                        <div class="spinner-border text-success" role="status">
+                            <span class="visually-hidden"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="sendMail()">작성</button>
+                </div>
             </div>
         </div>
     </div>
