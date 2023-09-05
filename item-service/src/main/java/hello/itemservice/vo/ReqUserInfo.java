@@ -12,5 +12,6 @@ public class ReqUserInfo {
     private String userPhone;
     private String userZipcode;
     private String userAddress;
+    private String userDetailAddress;
 
 }

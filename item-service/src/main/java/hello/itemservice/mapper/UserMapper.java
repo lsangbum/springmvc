@@ -17,4 +17,6 @@ public interface UserMapper {
     List<BoardList> getBoard() throws SQLException;
 
     Integer insertJoin(ReqUserInfo userInfo) throws SQLException;
+
+    Map getCheckUserId(@Param("userId") String userId)throws SQLException;
 }
