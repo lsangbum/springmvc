@@ -79,8 +79,9 @@ public class UserController {
     @GetMapping("/view")
     public String view(Model model, HttpServletRequest request) throws Exception {
         HttpSession session = request.getSession();
-        model.addAttribute("list", userService.getBoard());
-        System.out.println(userService.getBoard().get(0).toString());
+        if (userService.getBoard() != null) {
+            model.addAttribute("list", userService.getBoard());
+        }
         model.addAttribute("userId", session.getAttribute("userId"));
         return "view/view1";
     }
