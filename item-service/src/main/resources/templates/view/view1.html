@@ -10,9 +10,16 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <!-- 이중 모달 사용 시 부모 창 스크롤 장애문제 해결 css -->
+    <style>
+        .modal {overflow-y:auto;}
+    </style>
     <script th:inline="javascript">
 
         let createDate;
+        let userPwd;
 
         /* 로그아웃 */
         function logout() {
@@ -93,12 +100,151 @@
                 })
             }
         }
+
         /* 작성글 확인 */
         function getBoard(title, content) {
             $("#exampleModalLabel").val(title);
             $("#exampleModalBody").text(content);
 
         }
+
+        /* 회원정보 수정 모달 */
+        function modifyUserInfoModal() {
+            $("#userid").val("");
+            $("#userpwd").val("");
+            $("#username").val("");
+            $("#birth").val("");
+            $("#phone").val("");
+            $("#zipcode").val("");
+            $("#address").val("");
+
+            $.ajax({
+                type: "POST",
+                url: "/user/get/info",
+                data: {
+                    "userId" : [[${userId}]]
+                },
+                success: function(data) {
+                    userPwd = data.userPwd;
+                    $("#chkstatus").hide();
+                    $("#chkstatus2").hide();
+
+                    $("#userid").val(data.userId);
+                    $("#username").val(data.userName);
+                    $("#birth").val(data.userBirth);
+                    $("#phone").val(data.userPhone);
+                    $("#zipcode").val(data.userZipcode);
+                    $("#address").val(data.userAddress);
+                    $("#detailAddress").val(data.userDetailAddress);
+
+                },
+                error: function (data) {
+                    console.log(data);
+                    alert("같은 증상이 반복되는 경우 이상범한테 전화주세요.");
+                },
+            })
+            $("#modifyUserInfoModal").modal('show');
+        }
+        /* 회원정보 수정 */
+        function modifyUserInfo() {
+
+            if(!!!$("#userid").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#userid").focus();
+                return false;
+            }
+            if(!!!$("#userpwd").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#userpwd").focus();
+                return false;
+            }
+            if(!!!$("#userpwd2").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#userpwd2").focus();
+                return false;
+            }
+            if(!!!$("#username").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#username").focus();
+                return false;
+            }
+            if(!!!$("#birth").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#birth").focus();
+                return false;
+            }
+            if(!!!$("#phone").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#phone").focus();
+                return false;
+            }
+            if(!!!$("#zipcode").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#zipcode").focus();
+                return false;
+            }
+            if(!!!$("#address").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#address").focus();
+                return false;
+            }
+            if (userPwd != $("#userpwd").val()) {
+                $("#chkstatus2").hide();
+                $("#chkstatus").show();
+                $("#userpwd").focus();
+                return false;
+            }else {
+                $("#chkstatus").hide();
+                $("#chkstatus2").show();
+
+                let userInfo = {
+                    "userId"    : $("#userid").val(),
+                    "userPwd"   : $("#userpwd2").val(),
+                    "userName"  : $("#username").val(),
+                    "userBirth"     : $("#birth").val(),
+                    "userPhone"     : $("#phone").val(),
+                    "userZipcode"   : $("#zipcode").val(),
+                    "userAddress"   : $("#address").val(),
+                    "userDetailAddress" :   $("#detailAddress").val(),
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "/user/update/info",
+                    data: JSON.stringify(userInfo),
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function(data) {
+                        if(data == 1) {
+                            $("#modifyUserModal").modal('show');
+                            $("#modifyUserInfoModal").modal('hide');
+                        }else {
+                            alert("실패");
+                        }
+                    },
+                    error: function(data) {
+                        console.log(data);
+                    }
+                })
+            }
+        }
+        /* daumMap 호출 */
+        function findAddr() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    let addr = '';  //받아올 주소 데이터
+
+                    if (data.userSelectedType === 'R') {    //사용자가 도로명 주소를 선택한 경우 (R)
+                        addr = data.roadAddress;
+                    }else {                                 //사용자가 지번 주소를 선택한 경우 (J)
+                        addr = data.jibunAddress;
+                    }
+                    $("#address").val(addr);
+                    $("#zipcode").val(data.zonecode);
+                }
+            }).open();
+        }
+
         /* 글쓰끼 저장 */
         function save() {
             if(confirm("저장하시겠습니까 ?")) {
@@ -181,16 +327,24 @@
 
     </script>
 </head>
-<body class="bg-light">
+<body class="bg-light d-flex flex-column min-vh-100 ">
     <div class="container mt-5">
         <h1 class="mb-4">
             <span>게시판</span>
-            <button type="button" class="btn btn-danger float-right" onclick="logout()">로그아웃</button>
-        </h1>
+                <div class="btn-group dropdown float-right">
+                    <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        [[${userId}]]
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-dark">
+                        <!-- 추가 메뉴 항목 -->
+                        <button class="dropdown-item" onclick="modifyUserInfoModal();">회원정보수정</button>
+                        <button class="dropdown-item" onclick="getWrite();">글쓰기</button>
+                        <button class="dropdown-item" onclick="getSendMail();">메일 발송</button>
+                        <button class="dropdown-item text-danger" onclick="logout();">로그아웃</button>
+                    </div>
+                </div>
 
-        <div>
-            <span>사용자 : [[${userId}]]</span>
-        </div>
+        </h1>
         <!-- 게시물 목록 -->
         <table class="table">
             <thead>
@@ -217,8 +371,6 @@
                 </tr>
             </tbody>
         </table>
-        <button type="button" class="btn btn-success" onclick="getWrite()">글쓰기</button>
-        <button type="button" class="btn btn-success" onclick="getSendMail()">메일 발송</button>
         <button type="button" class="btn btn-success float-right" onclick="goBack()">뒤로가기</button>
     </div>
 
@@ -319,6 +471,110 @@
             </div>
         </div>
     </div>
+    <!-- 회원정보 수정 모달 -->
+    <div class="modal fade" id="modifyUserInfoModal" tabindex="-1" aria-labelledby="modifyUserInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="smodifyUserInfoModalLabel">회원정보 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="userid" class="form-label">아이디</label>
+                            <input type="text" class="form-control" id="userid" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userpwd" class="form-label">기존 비밀번호</label>
+                            <input type="password" class="form-control" id="userpwd">
+                            <span class="text-danger small" id="chkstatus" style="display: none;">※ 기존 비밀번호가 일치하지 않습니다.</span>
+                            <span class="text-success small" id="chkstatus2" style="display: none;">※ 변경 가능한 비밀번호 입니다.</span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userpwd" class="form-label">신규 비밀번호</label>
+                            <input type="password" class="form-control" id="userpwd2">
+                        </div>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">이름</label>
+                            <input type="text" class="form-control" id="username">
+                        </div>
+                        <div class="mb-3">
+                            <label for="birth" class="form-label">생년월일</label>
+                            <input type="date" class="form-control" id="birth">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">핸드폰번호</label>
+                            <input type="tel" class="form-control" id="phone">
+                        </div>
+                        <div class="mb-3">
+                            <label for="zipcode" class="form-label">우편번호</label>
+                            <div class="form-inline">
+                                <input type="text" class="form-control w-75 p-3" id="zipcode" placeholder="우편번호" readonly>
+                                <input type="button" class="btn btn-secondary float-right ml-auto" id="addressSearch" value="주소검색" onclick="findAddr()">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">주소</label>
+                            <input type="text" class="form-control" id="address" placeholder="배송받을 주소를 검색해주세요." readonly>
+
+                        </div>
+                        <div class="mb-3">
+                            <label for="zipcode" class="form-label">상세주소</label>
+                            <input type="text" class="form-control" id="detailAddress">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="modifyUserInfo();">수정</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 필수 입력 값 모달 -->
+    <div class="modal fade" id="inputTagModal" tabindex="-1" aria-labelledby="inputTagModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inputTagModalLabel">✍</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    미입력 항목이 있습니다.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 회원정보 수정 성공 모달 -->
+    <div class="modal fade" id="modifyUserModal" tabindex="-1" aria-labelledby="modifyUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modifyUserModalLabel">🙌</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    회원정보 수정완료
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 푸터 시작 -->
+    <footer class="bg-dark text-white text-center py-3 mt-3">
+        <div class="container">
+            <p>
+                &copy; 이상범의 AWS jenkins docker 여행 메뉴 리스트
+            </p>
+        </div>
+    </footer>
+    <!-- 푸터 끝 -->
 </body>
 </html>
 

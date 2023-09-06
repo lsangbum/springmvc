@@ -4,6 +4,7 @@ import hello.itemservice.vo.BoardList;
 import hello.itemservice.vo.ReqUserInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.jdbc.SQL;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.sql.SQLException;
@@ -19,4 +20,8 @@ public interface UserMapper {
     Integer insertJoin(ReqUserInfo userInfo) throws SQLException;
 
     Map getCheckUserId(@Param("userId") String userId)throws SQLException;
+
+    ReqUserInfo getUserInfo(String userId) throws SQLException;
+
+    Integer updateUserInfo(ReqUserInfo userInfo) throws SQLException;
 }
