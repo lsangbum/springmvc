@@ -46,6 +46,18 @@ public class UserController {
 
     /**
      * @writer  이상범
+     * @date    230906
+     * @script  회원정보 수정
+     * @return  성공 1 실패 0
+     */
+    @PostMapping("/update/info")
+    @ResponseBody
+    public Integer updateUserInfo(@RequestBody ReqUserInfo userInfo) throws Exception {
+        return userService.updateUserInfo(userInfo);
+    }
+
+    /**
+     * @writer  이상범
      * @date    230830
      * @script  아이디, 비밀번호 확인 API
      * @return  성공 1 실패 0
@@ -87,6 +99,19 @@ public class UserController {
         }
         return "redirect:/";
     }
+    
+    /**
+     * @writer  이상범
+     * @date    230906
+     * @script  회원정보 불러오기
+     * @return  회원정보
+     */
+    @PostMapping("/get/info")
+    @ResponseBody
+    public ReqUserInfo getUserInfo(String userId) throws Exception {
+        return userService.getUserInfo(userId);
+    }
+
 
     /**
      * 확인 후 삭제

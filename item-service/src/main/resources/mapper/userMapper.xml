@@ -2,6 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="hello.itemservice.mapper.UserMapper">
 
+    <select id="getUserInfo" parameterType="String" resultType="hello.itemservice.vo.ReqUserInfo">
+        SELECT  UID             AS  userId
+             ,  PWD             AS  userPwd
+             ,  NAME            AS  userName
+             ,  BIRTH           AS  userBirth
+             ,  PHONE           AS  userPhone
+             ,  ZIPCODE         AS  userZipcode
+             ,  ADDRESS         AS  userAddress
+             ,  DETAILADDRESS   AS  userDetailAddress
+        FROM    USER
+        WHERE   UID = #{userId};
+    </select>
+
     <select id="getCheckUserId" parameterType="String" resultType="map">
         SELECT  CASE
                 WHEN
@@ -40,42 +53,27 @@
         )
     </insert>
 
+    <update id="updateUserInfo" parameterType="hello.itemservice.vo.ReqUserInfo">
+        UPDATE  USER
+        SET     PWD             =   #{userPwd}
+            ,   NAME            =   #{userName}
+            ,   BIRTH           =   #{userBirth}
+            ,   PHONE           =   #{userPhone}
+            ,   ZIPCODE         =   #{userZipcode}
+            ,   ADDRESS         =   #{userAddress}
+            ,   DETAILADDRESS   =   #{userDetailAddress}
+        WHERE   UID             =   #{userId}
+    </update>
+
     <select id="loginChk" parameterType="String" resultType="map">
-        SELECT  CASE
-                WHEN
-                EXISTS (
-                        SELECT	1
-                        FROM	    USER
-                        WHERE	    UID	=	#{email}
-                        AND	        PWD	=	#{pwd}
-                       )
-                THEN	1
-                ELSE	0
-                END	AS	result;
+        SELECT  PWD
+        FROM    USER
+        WHERE   UID =   #{email};
     </select>
 
     <select id="getBoard" resultType="hello.itemservice.vo.BoardList">
         SELECT  *
         FROM    BOARD;
     </select>
-
-
-    <!--
-        <insert id="insertTest" parameterType="String">
-            INSERT INTO TEST
-                VALUES  (
-                            #{uuid}
-                         ,  #{values}
-                        );
-        </insert>
-
-        <insert id="loginTest" parameterType="String">
-            INSERT INTO TEST
-                VALUES  (
-                            #{userName}
-                        ,   #{passwordName}
-                        );
-        </insert>
-    -->
 
 </mapper>
