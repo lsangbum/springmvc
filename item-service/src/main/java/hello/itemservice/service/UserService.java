@@ -39,9 +39,7 @@ public class UserService {
     }
 
     public Integer insertJoin(ReqUserInfo userInfo) throws SQLException {
-        String encryptedPassword = passwordEncoder.encode(userInfo.getUserPwd());
-        userInfo.setUserPwd(encryptedPassword);
-        return userMapper.insertJoin(userInfo);
+        return userMapper.insertJoin(passwordEncode(userInfo));
     }
 
     public Map getCheckUserId(String userId) throws SQLException {
@@ -53,6 +51,23 @@ public class UserService {
     }
 
     public Integer updateUserInfo(ReqUserInfo userInfo) throws SQLException {
-        return userMapper.updateUserInfo(userInfo);
+        Map<String, String> result = loginChk(userInfo.getUserId(), userInfo.getUserPwd());
+        if (result.get("result").equals("1")) {
+            userInfo.setUserPwd(userInfo.getUserNewPwd());
+            return userMapper.updateUserInfo(passwordEncode(userInfo));
+        }
+        return 0;
+    }
+
+    /**
+     * @writer  이상범
+     * @date    230906
+     * @script  비밀번호 암호화 / 스프링 시큐리티 사용
+     * @return  userInfo
+     */
+    private ReqUserInfo passwordEncode(ReqUserInfo userInfo) {
+        String encryptedPassword = passwordEncoder.encode(userInfo.getUserPwd());
+        userInfo.setUserPwd(encryptedPassword);
+        return userInfo;
     }
 }

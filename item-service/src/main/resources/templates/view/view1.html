@@ -19,7 +19,6 @@
     <script th:inline="javascript">
 
         let createDate;
-        let userPwd;
 
         /* 로그아웃 */
         function logout() {
@@ -125,7 +124,6 @@
                     "userId" : [[${userId}]]
                 },
                 success: function(data) {
-                    userPwd = data.userPwd;
                     $("#chkstatus").hide();
                     $("#chkstatus2").hide();
 
@@ -188,45 +186,40 @@
                 $("#address").focus();
                 return false;
             }
-            if (userPwd != $("#userpwd").val()) {
-                $("#chkstatus2").hide();
-                $("#chkstatus").show();
-                $("#userpwd").focus();
-                return false;
-            }else {
-                $("#chkstatus").hide();
-                $("#chkstatus2").show();
-
-                let userInfo = {
-                    "userId"    : $("#userid").val(),
-                    "userPwd"   : $("#userpwd2").val(),
-                    "userName"  : $("#username").val(),
-                    "userBirth"     : $("#birth").val(),
-                    "userPhone"     : $("#phone").val(),
-                    "userZipcode"   : $("#zipcode").val(),
-                    "userAddress"   : $("#address").val(),
-                    "userDetailAddress" :   $("#detailAddress").val(),
-                }
-
-                $.ajax({
-                    type: "POST",
-                    url: "/user/update/info",
-                    data: JSON.stringify(userInfo),
-                    dataType: "json",
-                    contentType: "application/json; charset=utf-8",
-                    success: function(data) {
-                        if(data == 1) {
-                            $("#modifyUserModal").modal('show');
-                            $("#modifyUserInfoModal").modal('hide');
-                        }else {
-                            alert("실패");
-                        }
-                    },
-                    error: function(data) {
-                        console.log(data);
-                    }
-                })
+            let userInfo = {
+                "userId"    : $("#userid").val(),
+                "userPwd"   : $("#userpwd").val(),
+                "userName"  : $("#username").val(),
+                "userBirth"     : $("#birth").val(),
+                "userPhone"     : $("#phone").val(),
+                "userZipcode"   : $("#zipcode").val(),
+                "userAddress"   : $("#address").val(),
+                "userDetailAddress" :   $("#detailAddress").val(),
+                "userNewPwd"        :   $("#userpwd2").val(),
             }
+
+            $.ajax({
+                type: "POST",
+                url: "/user/update/info",
+                data: JSON.stringify(userInfo),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function(data) {
+                    if(data == 1) {
+                        $("#chkstatus").hide();
+                        $("#chkstatus2").show();
+                        $("#modifyUserModal").modal('show');
+                        $("#modifyUserInfoModal").modal('hide');
+                    }else {
+                        $("#chkstatus2").hide();
+                        $("#chkstatus").show();
+                        $("#userpwd").focus();
+                    }
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            })
         }
         /* daumMap 호출 */
         function findAddr() {
@@ -328,7 +321,7 @@
     </script>
 </head>
 <body class="bg-light d-flex flex-column min-vh-100 ">
-    <div class="container mt-5">
+    <div class="container mt-5 mb-3">
         <h1 class="mb-4">
             <span>게시판</span>
                 <div class="btn-group dropdown float-right">
@@ -371,7 +364,7 @@
                 </tr>
             </tbody>
         </table>
-        <button type="button" class="btn btn-success float-right" onclick="goBack()">뒤로가기</button>
+        <button type="button" class="btn btn-danger float-right btn-sm" onclick="goBack()">뒤로가기</button>
     </div>
 
     <!--게시글 확인 모달-->
@@ -567,7 +560,7 @@
         </div>
     </div>
     <!-- 푸터 시작 -->
-    <footer class="bg-dark text-white text-center py-3 mt-3">
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
         <div class="container">
             <p>
                 &copy; 이상범의 AWS jenkins docker 여행 메뉴 리스트

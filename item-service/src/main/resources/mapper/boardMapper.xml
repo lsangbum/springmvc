@@ -15,7 +15,7 @@
             #{title}
         ,   #{content}
         ,   #{uid}
-        ,   now()
+        ,   DATE_ADD(now(), INTERVAL 9 HOUR)
         )
     </insert>
 
@@ -23,7 +23,7 @@
         UPDATE  BOARD
         SET     TITLE       = #{title}
             ,   CONTENT     = #{content}
-            ,   MODIFYDATE  = now()
+            ,   MODIFYDATE  = DATE_ADD(now(), INTERVAL 9 HOUR)
         WHERE   UID         = #{uid}
         AND     DATE        = #{date}
     </update>
