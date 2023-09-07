@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -14,6 +15,10 @@ import java.sql.SQLException;
 public class BoardService {
 
     private final BoardMapper boardMapper;
+
+    public List<BoardList> getBoard() throws SQLException {
+        return boardMapper.getBoard();
+    }
 
     public Integer setWrite(String title, String content, String uid) throws SQLException {
         return boardMapper.setWrite(title, content, uid);

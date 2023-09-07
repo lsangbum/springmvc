@@ -34,10 +34,6 @@ public class UserService {
         return result;
     }
 
-    public List<BoardList> getBoard() throws SQLException {
-        return userMapper.getBoard();
-    }
-
     public Integer insertJoin(ReqUserInfo userInfo) throws SQLException {
         return userMapper.insertJoin(passwordEncode(userInfo));
     }

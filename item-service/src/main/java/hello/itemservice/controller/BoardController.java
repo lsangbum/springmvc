@@ -4,10 +4,15 @@ import hello.itemservice.service.BoardService;
 import hello.itemservice.vo.BoardList;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -16,6 +21,27 @@ import org.springframework.web.bind.annotation.RestController;
 public class BoardController {
 
     private final BoardService boardService;
+
+    /**
+     * @writer  이상범
+     * @date    230830
+     * @script  로그인 아이디세션저장 후 페이지이동
+     * @return  view/view1
+     */
+    @GetMapping("/view")
+    public ModelAndView view(ModelAndView model, HttpServletRequest request) throws Exception {
+        HttpSession session = request.getSession();
+        List<BoardList> list = boardService.getBoard();
+
+        if (list != null) {
+            model.addObject("list", list);
+        }
+
+        model.addObject("userId", session.getAttribute("userId"));
+        model.setViewName("view/view1");
+
+        return model;
+    }
 
     /**
      * @writer  이상범

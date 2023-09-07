@@ -324,19 +324,18 @@
     <div class="container mt-5 mb-3">
         <h1 class="mb-4">
             <span>게시판</span>
-                <div class="btn-group dropdown float-right">
-                    <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        [[${userId}]]
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-dark">
-                        <!-- 추가 메뉴 항목 -->
-                        <button class="dropdown-item" onclick="modifyUserInfoModal();">회원정보수정</button>
-                        <button class="dropdown-item" onclick="getWrite();">글쓰기</button>
-                        <button class="dropdown-item" onclick="getSendMail();">메일 발송</button>
-                        <button class="dropdown-item text-danger" onclick="logout();">로그아웃</button>
-                    </div>
+            <div class="btn-group dropdown float-right">
+                <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    [[${userId}]]
+                </button>
+                <div class="dropdown-menu dropdown-menu-dark">
+                    <!-- 추가 메뉴 항목 -->
+                    <button class="dropdown-item" onclick="modifyUserInfoModal();">회원정보수정</button>
+                    <button class="dropdown-item" onclick="getWrite();">글쓰기</button>
+                    <button class="dropdown-item" onclick="getSendMail();">메일 발송</button>
+                    <button class="dropdown-item text-danger" onclick="logout();">로그아웃</button>
                 </div>
-
+            </div>
         </h1>
         <!-- 게시물 목록 -->
         <table class="table">
@@ -381,13 +380,13 @@
             </div>
         </div>
     </div>
-    <!-- 글쓰기 모달 -->
+    <!-- 글쓰기 모달 여기-->
     <div class="modal fade" id="writeModal" tabindex="-1" role="dialog" aria-labelledby="writeModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="writeModalLabel">게시글 작성</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -404,7 +403,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closed()">취소</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
                     <button type="button" class="btn btn-primary" onclick="save()">작성</button>
                 </div>
             </div>
@@ -425,13 +424,13 @@
             </div>
         </div>
     </div>
-    <!-- 메일 발송 모달 -->
+    <!-- 메일 발송 모달-->
     <div class="modal fade" id="sendMailModal" tabindex="-1" role="dialog" aria-labelledby="sendMailModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="sendMailModalLabel">메일 발송</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -458,7 +457,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
                     <button type="button" class="btn btn-primary" onclick="sendMail()">작성</button>
                 </div>
             </div>
@@ -470,7 +469,9 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="smodifyUserInfoModalLabel">회원정보 수정</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <form>
