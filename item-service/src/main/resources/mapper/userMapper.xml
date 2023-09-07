@@ -71,9 +71,4 @@
         WHERE   UID =   #{email};
     </select>
 
-    <select id="getBoard" resultType="hello.itemservice.vo.BoardList">
-        SELECT  *
-        FROM    BOARD;
-    </select>
-
 </mapper>

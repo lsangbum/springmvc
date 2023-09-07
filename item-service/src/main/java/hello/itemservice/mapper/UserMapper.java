@@ -2,6 +2,7 @@ package hello.itemservice.mapper;
 
 import hello.itemservice.vo.BoardList;
 import hello.itemservice.vo.ReqUserInfo;
+import hello.itemservice.vo.SearchBoard;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.jdbc.SQL;
@@ -14,8 +15,6 @@ import java.util.Map;
 @Mapper
 public interface UserMapper {
     Map loginChk(@Param("email") String email, @Param("pwd") String pwd) throws SQLException;
-
-    List<BoardList> getBoard() throws SQLException;
 
     Integer insertJoin(ReqUserInfo userInfo) throws SQLException;
 

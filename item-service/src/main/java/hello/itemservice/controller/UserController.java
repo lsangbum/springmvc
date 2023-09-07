@@ -72,22 +72,6 @@ public class UserController {
 
     /**
      * @writer  이상범
-     * @date    230830
-     * @script  로그인 아이디세션저장 후 페이지이동
-     * @return  view/view1
-     */
-    @GetMapping("/view")
-    public String view(Model model, HttpServletRequest request) throws Exception {
-        HttpSession session = request.getSession();
-        if (userService.getBoard() != null) {
-            model.addAttribute("list", userService.getBoard());
-        }
-        model.addAttribute("userId", session.getAttribute("userId"));
-        return "view/view1";
-    }
-
-    /**
-     * @writer  이상범
      * @date    230905
      * @script  로그아웃 세션삭제
      * @return  index
