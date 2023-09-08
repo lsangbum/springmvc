@@ -4,14 +4,15 @@ import hello.itemservice.service.BoardService;
 import hello.itemservice.vo.BoardList;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -50,8 +51,25 @@ public class BoardController {
      * @return  성공 1 실패 0
      */
     @PostMapping("/write")
-    public Integer setWrite(String title, String content, String uid) throws Exception {
-        return boardService.setWrite(title, content, uid);
+    public ModelAndView setWrite(@ModelAttribute BoardList boardList, @Value("${spring.servlet.multipart.location}") String uploadFolder,
+                            ModelAndView mv) throws Exception {
+
+        /* uploadPath   = 업로드 폴더 경로 저장
+         * filePath     = 파일 저장 경로 설정
+         * destinationFile / transferTo(destinationFile) = 파일 저장
+         */
+        Path uploadPath = Paths.get(uploadFolder);
+        Path filePath = uploadPath.resolve(boardList.getFile().getOriginalFilename());
+        File destinationFile = new File(filePath.toString());
+        boardList.getFile().transferTo(destinationFile);
+
+        boardList.setFileName(boardList.getFile().getOriginalFilename());
+        boardList.setFilePath(uploadFolder + "/");
+        boardList.setFileSize(boardList.getFile().getSize());
+
+        boardService.setWrite(boardList);
+        mv.setViewName("redirect:/board/view");
+        return mv;
     }
     /**
      * @writer  이상범

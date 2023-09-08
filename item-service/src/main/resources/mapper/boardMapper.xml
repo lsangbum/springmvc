@@ -4,10 +4,14 @@
 
     <!-- 게시글 리스트 조회 -->
     <select id="getBoard" resultType="hello.itemservice.vo.BoardList">
-        SELECT   TITLE
-             ,   CONTENT
-             ,   UID
-             ,   DATE
+        SELECT      TITLE       AS  title
+             ,      CONTENT     AS  content
+             ,      UID         AS  uid
+             ,      DATE        AS  date
+             ,      MODIFYDATE  AS  modifydate
+             ,      FILENAME    AS  fileName
+             ,      FILEPATH    AS  filePath
+             ,      FILESIZE    AS  fileSize
         FROM     BOARD;
     </select>
 
@@ -18,13 +22,16 @@
     </select>
 
     <!-- 게시글 작성 -->
-    <insert id="setWrite" parameterType="String">
+    <insert id="setWrite" parameterType="hello.itemservice.vo.BoardList">
         INSERT INTO BOARD
         (
             TITLE
         ,   CONTENT
         ,   UID
         ,   DATE
+        ,   FILENAME
+        ,   FILEPATH
+        ,   FILESIZE
         )
         VALUE
         (
@@ -32,6 +39,9 @@
         ,   #{content}
         ,   #{uid}
         ,   DATE_ADD(now(), INTERVAL 9 HOUR)
+        ,   #{fileName}
+        ,   #{filePath}
+        ,   #{fileSize}
         )
     </insert>
 

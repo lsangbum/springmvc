@@ -4,6 +4,7 @@ import hello.itemservice.vo.BoardList;
 import hello.itemservice.vo.SearchBoard;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -25,7 +26,7 @@ public interface BoardMapper {
     /** 게시글 작성
      * @return 성공 1 실패 0
      */
-    Integer setWrite(@Param("title") String title, @Param("content") String content, @Param("uid") String uid) throws SQLException;
+    Integer setWrite(BoardList boardList) throws SQLException;
 
     /** 게시글 수정
      * @return 성공 1 실패 0
