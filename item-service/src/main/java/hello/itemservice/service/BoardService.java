@@ -5,6 +5,7 @@ import hello.itemservice.vo.BoardList;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -20,8 +21,8 @@ public class BoardService {
         return boardMapper.getBoard();
     }
 
-    public Integer setWrite(String title, String content, String uid) throws SQLException {
-        return boardMapper.setWrite(title, content, uid);
+    public Integer setWrite(BoardList boardList) throws SQLException {
+        return boardMapper.setWrite(boardList);
     }
 
     public Integer updateLetter(BoardList boardList) throws SQLException {
