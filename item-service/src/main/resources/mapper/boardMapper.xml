@@ -4,14 +4,7 @@
 
     <!-- 게시글 리스트 조회 -->
     <select id="getBoard" resultType="hello.itemservice.vo.BoardList">
-        SELECT      TITLE       AS  title
-             ,      CONTENT     AS  content
-             ,      UID         AS  uid
-             ,      DATE        AS  date
-             ,      MODIFYDATE  AS  modifydate
-             ,      FILENAME    AS  fileName
-             ,      FILEPATH    AS  filePath
-             ,      FILESIZE    AS  fileSize
+        SELECT      *
         FROM     BOARD;
     </select>
 
@@ -51,6 +44,9 @@
         SET     TITLE       = #{title}
             ,   CONTENT     = #{content}
             ,   MODIFYDATE  = DATE_ADD(now(), INTERVAL 9 HOUR)
+            ,   FILENAME    = #{fileName}
+            ,   FILEPATH    = #{filePath}
+            ,   FILESIZE    = #{fileSize}
         WHERE   UID         = #{uid}
         AND     DATE        = #{date}
     </update>

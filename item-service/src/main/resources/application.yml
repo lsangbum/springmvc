@@ -21,9 +21,10 @@ spring:
     servlet:
         multipart:
             enabled: true
-            max-file-size: 10MB
-            max-request-size: 10MB
-            location: /app/images/upload
+            max-file-size: 30MB
+            max-request-size: 15MB
+            location: /app/images/upload   #서버저장
+#            location: D:test    #로컬저장
 
 mybatis:
     mapper-locations: mapper/*.xml

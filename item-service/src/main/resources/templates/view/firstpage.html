@@ -1,15 +1,600 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>File Upload</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시판</title>
+    <!-- 부트스트랩 링크 추가 -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- 부트스트랩 스크립트 추가 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <!-- 이중 모달 사용 시 부모 창 스크롤 장애문제 해결 css -->
+    <style>
+        .modal {overflow-y:auto;}
+    </style>
+    <script th:inline="javascript">
+
+        let createDate;
+
+        /* 로그아웃 */
+        function logout() {
+            location.href="/user/logout"
+        }
+
+        /* 뒤로가기 */
+        function goBack() {
+            window.history.back();
+        }
+        /* 글쓰기 모달 창 오픈 */
+        function getWrite() {
+            $("#writeModal").modal("show");
+        }
+        /* 게시글 수정 모달 */
+        function updateLetterModal(title, content, createDate, fileName, filePath, fileSize) {
+            let imagePath = filePath + fileName;
+
+            $("#updateModalLabel").val(title);
+            $("#updateModalBody").text(content);
+
+            $("#downloadFile").remove();
+            $("#imageBody").append("<img src='" + imagePath + "' alt='" + fileSize + "' id='downloadFile' width='200' height='200'>")
+            this.createDate = createDate;
+        }
+        /* 게시글 수정 모달 */
+        function updateLetter() {
+            let data = {
+                "title" : $("#updateModalLabel").val(),
+                "content" : $("#updateModalBody").val(),
+                "uid" : [[${userId}]],
+                "date" : this.createDate
+            }
+            if(confirm("수정하시겠습니까 ?")) {
+                $.ajax({
+                    type: "POST",
+                    url: "/board/updateLetter",
+                    data: JSON.stringify(data),
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function(data) {
+                        if(data == 1) {
+                            alert("수정완료")
+                            location.reload(true);
+                        }else {
+                            alert("수정실패");
+                        }
+                    },
+                    error: function (data) {
+                        console.log(data);
+                        alert("같은 증상이 반복되는 경우 이상범한테 전화주세요.");
+                    },
+                })
+            }
+        }
+        /* 게시글 삭제 */
+        function deleteLetter(title, uid, date) {
+            let data = {
+                "title" : title,
+                "content" : "",
+                "uid" : uid,
+                "date" : date
+            }
+            if(confirm("삭제하시겠습니까 ?")) {
+                $.ajax({
+                    type: "POST",
+                    url: "/board/deleteLetter",
+                    data: JSON.stringify(data),
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function(data) {
+                        if(data == 1) {
+                            alert("삭제완료")
+                            location.reload(true);
+                        }else {
+                            alert("삭제실패");
+                        }
+                    },
+                    error: function (data) {
+                        console.log(data);
+                        alert("같은 증상이 반복되는 경우 이상범한테 전화주세요.");
+                    },
+                })
+            }
+        }
+
+        /* 작성글 확인 */
+        function getBoard(title, content, fileName, filePath, fileSize) {
+            let imagePath = filePath + fileName;
+
+            $("#exampleModalLabel").val(title);
+            $("#exampleModalBody").text(content);
+
+            $("#downloadFile2").remove();
+            $("#imageBody2").append("<img src='" + imagePath + "' alt='" + fileSize + "' id='downloadFile2' width='200' height='200'>")
+        }
+
+        /* 회원정보 수정 모달 */
+        function modifyUserInfoModal() {
+            $("#userid").val("");
+            $("#userpwd").val("");
+            $("#username").val("");
+            $("#birth").val("");
+            $("#phone").val("");
+            $("#zipcode").val("");
+            $("#address").val("");
+
+            $.ajax({
+                type: "POST",
+                url: "/user/get/info",
+                data: {
+                    "userId" : [[${userId}]]
+                },
+                success: function(data) {
+                    $("#chkstatus").hide();
+                    $("#chkstatus2").hide();
+
+                    $("#userid").val(data.userId);
+                    $("#username").val(data.userName);
+                    $("#birth").val(data.userBirth);
+                    $("#phone").val(data.userPhone);
+                    $("#zipcode").val(data.userZipcode);
+                    $("#address").val(data.userAddress);
+                    $("#detailAddress").val(data.userDetailAddress);
+
+                },
+                error: function (data) {
+                    console.log(data);
+                    alert("같은 증상이 반복되는 경우 이상범한테 전화주세요.");
+                },
+            })
+            $("#modifyUserInfoModal").modal('show');
+        }
+        /* 회원정보 수정 */
+        function modifyUserInfo() {
+
+            if(!!!$("#userid").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#userid").focus();
+                return false;
+            }
+            if(!!!$("#userpwd").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#userpwd").focus();
+                return false;
+            }
+            if(!!!$("#userpwd2").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#userpwd2").focus();
+                return false;
+            }
+            if(!!!$("#username").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#username").focus();
+                return false;
+            }
+            if(!!!$("#birth").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#birth").focus();
+                return false;
+            }
+            if(!!!$("#phone").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#phone").focus();
+                return false;
+            }
+            if(!!!$("#zipcode").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#zipcode").focus();
+                return false;
+            }
+            if(!!!$("#address").val().trim()) {
+                $("#inputTagModal").modal('show');
+                $("#address").focus();
+                return false;
+            }
+            let userInfo = {
+                "userId"    : $("#userid").val(),
+                "userPwd"   : $("#userpwd").val(),
+                "userName"  : $("#username").val(),
+                "userBirth"     : $("#birth").val(),
+                "userPhone"     : $("#phone").val(),
+                "userZipcode"   : $("#zipcode").val(),
+                "userAddress"   : $("#address").val(),
+                "userDetailAddress" :   $("#detailAddress").val(),
+                "userNewPwd"        :   $("#userpwd2").val(),
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/user/update/info",
+                data: JSON.stringify(userInfo),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function(data) {
+                    if(data == 1) {
+                        $("#chkstatus").hide();
+                        $("#chkstatus2").show();
+                        $("#modifyUserModal").modal('show');
+                        $("#modifyUserInfoModal").modal('hide');
+                    }else {
+                        $("#chkstatus2").hide();
+                        $("#chkstatus").show();
+                        $("#userpwd").focus();
+                    }
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            })
+        }
+        /* daumMap 호출 */
+        function findAddr() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    let addr = '';  //받아올 주소 데이터
+
+                    if (data.userSelectedType === 'R') {    //사용자가 도로명 주소를 선택한 경우 (R)
+                        addr = data.roadAddress;
+                    }else {                                 //사용자가 지번 주소를 선택한 경우 (J)
+                        addr = data.jibunAddress;
+                    }
+                    $("#address").val(addr);
+                    $("#zipcode").val(data.zonecode);
+                }
+            }).open();
+        }
+
+        /* 글쓰기 저장 */
+        function save() {
+            $("#uid").val([[${userId}]]);
+            return confirm("저장하시겠습니까 ?");
+        }
+        /* 글쓰기 취소 */
+        function closed() {
+            let result = confirm("창을 닫을 시 작성글이 저장되지 않습니다.");
+            if(result == 1) {
+                window.close();
+            }
+        }
+
+        /* 메일발송 모달 */
+        function getSendMail() {
+            $("#sendMailModal").modal("show");
+        }
+        /* 메일발송 */
+        function sendMail() {
+
+            if(confirm("발송하시겠습니까 ?")) {
+                showLoading();
+                $.ajax({
+                    type: "POST",
+                    url: "/mail/send",
+                    data: {
+                        "receiver"  : $("#receiver").val(),
+                        "title"     : $("#mailTitle").val(),
+                        "content"   : $("#mailContent").val(),
+                        "uid"       : [[${userId}]],
+                    },
+                    success: function(data) {
+                        hideLoading();
+                        if(data == 1) {
+                            alert("발송완료")
+                            location.reload(true);
+                        }else {
+                            alert("발송실패");
+                        }
+                    },
+                    error: function (data) {
+                        hideLoading();
+                        console.log(data);
+                        alert("같은 증상이 반복되는 경우 이상범한테 전화주세요.");
+                    },
+                })
+            }
+        }
+
+        /* 스핀 이미지 켜기 */
+        function showLoading() {
+            document.getElementById("loadingContainer").classList.remove("d-none");
+        }
+
+        /* 스핀 이미지 끄기 */
+        function hideLoading() {
+            document.getElementById("loadingContainer").classList.add("d-none");
+        }
+
+    </script>
 </head>
-<body>
-<form method="POST" action="/upload" enctype="multipart/form-data">
-    <input type="file" name="file">
-    <input type="submit" value="Upload">
-    <img src="http://localhost:8181/images/upload/P1070632.JPG" alt="이미지" id="qwe" width="200" height="200">
-    <a href="images/upload/P1070632.JPG">asd</a>
-</form>
+<body class="bg-light d-flex flex-column min-vh-100 ">
+<div class="container mt-5 mb-3">
+    <h1 class="mb-4">
+        <span>게시판</span>
+        <div class="btn-group dropdown float-right">
+            <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                [[${userId}]]
+            </button>
+            <div class="dropdown-menu dropdown-menu-dark">
+                <!-- 추가 메뉴 항목 -->
+                <button class="dropdown-item" onclick="modifyUserInfoModal();">회원정보수정</button>
+                <button class="dropdown-item" onclick="getWrite();">글쓰기</button>
+                <button class="dropdown-item" onclick="getSendMail();">메일 발송</button>
+                <button class="dropdown-item text-danger" onclick="logout();">로그아웃</button>
+            </div>
+        </div>
+    </h1>
+    <!-- 게시물 목록 -->
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">제목</th>
+            <th scope="col">글쓴이</th>
+            <th scope="col">작성일</th>
+            <th scope="col">수정 / 삭제</th>
+        </tr>
+        </thead>
+        <tbody th:each="list, listStat: ${list}">
+        <tr>
+            <th scope="row">[[${listStat.count}]]</th>
+            <td>
+                <button type="button" class="btn btn-link" data-toggle="modal" data-target="#myModal" th:onclick="getBoard([[${list.title}]], [[${list.content}]], [[${list.fileName}]], [[${list.filePath}]], [[${list.fileSize}]])">[[${list.title}]]</button>
+            </td>
+            <td>[[${list.uid}]]</td>
+            <td>[[${list.date}]]</td>
+            <td th:if="${list.uid == userId}">
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#updateModal" th:onclick="updateLetterModal([[${list.title}]], [[${list.content}]], [[${list.date}]], [[${list.fileName}]], [[${list.filePath}]], [[${list.fileSize}]])">수정</button>
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#deleteModal" th:onclick="deleteLetter([[${list.title}]], [[${list.uid}]], [[${list.date}]])">삭제</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-danger float-right btn-sm" onclick="goBack()">뒤로가기</button>
+</div>
+<!-- 게시글 확인 모달 ##-->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">게시글</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="title">제목</label>
+                    <input type="text" class="form-control" id="exampleModalLabel" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="content">내용</label>
+                    <textarea class="form-control" id="exampleModalBody" readonly></textarea>
+                </div>
+                <div class="form-group" id="imageBody2">
+                    <!-- 이미지삽입부 -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- 글쓰기 모달 여기-->
+<div class="modal fade" id="writeModal" tabindex="-1" role="dialog" aria-labelledby="writeModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="writeModalLabel">게시글 작성</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/board/write" method="post" enctype="multipart/form-data" onsubmit="return save()">
+                    <div class="form-group">
+                        <label for="title">제목</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="제목을 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="content">내용</label>
+                        <textarea class="form-control" id="content" name="content" rows="5" placeholder="내용을 입력하세요"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <input type="file" name="file" id="file">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="submit" class="btn btn-primary">작성</button>
+                    </div>
+                    <input type="hidden" name="uid" id="uid">
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- 게시글 수정 ##-->
+<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">게시글 수정</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/board/write" method="post" enctype="multipart/form-data" onsubmit="return updateLetter()">
+                    <div class="form-group">
+                        <label for="updateModalLabel">제목</label>
+                        <input type="text" class="form-control" id="updateModalLabel" name="title">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateModalBody">내용</label>
+                        <textarea class="form-control" id="updateModalBody" name="content" rows="5"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <input type="file" name="file" id="file2">
+                    </div>
+                    <div class="form-group" id="imageBody">
+                        <!-- 이미지삽입부 -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary" onclick="updateLetter()">수정</button>
+                    </div>
+                    <input type="hidden" name="uid" id="uid2">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 메일 발송 모달-->
+<div class="modal fade" id="sendMailModal" tabindex="-1" role="dialog" aria-labelledby="sendMailModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sendMailModalLabel">메일 발송</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="title">받는이 주소</label>
+                        <input type="text" class="form-control" id="receiver" placeholder="이메일 주소를 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="title">제목</label>
+                        <input type="text" class="form-control" id="mailTitle" placeholder="제목을 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="content">내용</label>
+                        <textarea class="form-control" id="mailContent" rows="5" placeholder="내용을 입력하세요"></textarea>
+                    </div>
+                </form>
+                <!-- 로딩 아이콘을 표시할 위치 -->
+                <div id="loadingContainer" class="d-none justify-content-center align-items-center">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" onclick="sendMail()">작성</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 회원정보 수정 모달 -->
+<div class="modal fade" id="modifyUserInfoModal" tabindex="-1" aria-labelledby="modifyUserInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="smodifyUserInfoModalLabel">회원정보 수정</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="userid" class="form-label">아이디</label>
+                        <input type="text" class="form-control" id="userid" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userpwd" class="form-label">기존 비밀번호</label>
+                        <input type="password" class="form-control" id="userpwd">
+                        <span class="text-danger small" id="chkstatus" style="display: none;">※ 기존 비밀번호가 일치하지 않습니다.</span>
+                        <span class="text-success small" id="chkstatus2" style="display: none;">※ 변경 가능한 비밀번호 입니다.</span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userpwd" class="form-label">신규 비밀번호</label>
+                        <input type="password" class="form-control" id="userpwd2">
+                    </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">이름</label>
+                        <input type="text" class="form-control" id="username">
+                    </div>
+                    <div class="mb-3">
+                        <label for="birth" class="form-label">생년월일</label>
+                        <input type="date" class="form-control" id="birth">
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">핸드폰번호</label>
+                        <input type="tel" class="form-control" id="phone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="zipcode" class="form-label">우편번호</label>
+                        <div class="form-inline">
+                            <input type="text" class="form-control w-75 p-3" id="zipcode" placeholder="우편번호" readonly>
+                            <input type="button" class="btn btn-secondary float-right ml-auto" id="addressSearch" value="주소검색" onclick="findAddr()">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">주소</label>
+                        <input type="text" class="form-control" id="address" placeholder="배송받을 주소를 검색해주세요." readonly>
+
+                    </div>
+                    <div class="mb-3">
+                        <label for="zipcode" class="form-label">상세주소</label>
+                        <input type="text" class="form-control" id="detailAddress">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" onclick="modifyUserInfo();">수정</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 필수 입력 값 모달 -->
+<div class="modal fade" id="inputTagModal" tabindex="-1" aria-labelledby="inputTagModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="inputTagModalLabel">✍</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                미입력 항목이 있습니다.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 회원정보 수정 성공 모달 -->
+<div class="modal fade" id="modifyUserModal" tabindex="-1" aria-labelledby="modifyUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modifyUserModalLabel">🙌</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                회원정보 수정완료
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 푸터 시작 -->
+<footer class="bg-dark text-white text-center py-3 mt-auto">
+    <div class="container">
+        <p>
+            &copy; 이상범의 AWS jenkins docker 여행 메뉴 리스트
+        </p>
+    </div>
+</footer>
+<!-- 푸터 끝 -->
 </body>
 </html>
+
