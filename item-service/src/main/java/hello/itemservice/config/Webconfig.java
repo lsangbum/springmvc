@@ -9,7 +9,7 @@ public class Webconfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String connectPath = "/app/images/upload/**";
-        String resourcePath = "file://app/images/upload/";
+        String resourcePath = "/app/images/upload/";
         registry.addResourceHandler(connectPath)
                 .addResourceLocations(resourcePath);
     }
