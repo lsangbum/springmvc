@@ -42,37 +42,39 @@
 
             $("#downloadFile").remove();
             $("#imageBody").append("<img src='" + imagePath + "' alt='" + fileSize + "' id='downloadFile' width='200' height='200'>")
-            this.createDate = createDate;
+            $("#modifyDate").val(createDate);
         }
         /* 게시글 수정 모달 */
         function updateLetter() {
-            let data = {
-                "title" : $("#updateModalLabel").val(),
-                "content" : $("#updateModalBody").val(),
-                "uid" : [[${userId}]],
-                "date" : this.createDate
-            }
-            if(confirm("수정하시겠습니까 ?")) {
-                $.ajax({
-                    type: "POST",
-                    url: "/board/updateLetter",
-                    data: JSON.stringify(data),
-                    dataType: "json",
-                    contentType: "application/json; charset=utf-8",
-                    success: function(data) {
-                        if(data == 1) {
-                            alert("수정완료")
-                            location.reload(true);
-                        }else {
-                            alert("수정실패");
-                        }
-                    },
-                    error: function (data) {
-                        console.log(data);
-                        alert("같은 증상이 반복되는 경우 이상범한테 전화주세요.");
-                    },
-                })
-            }
+            $("#uid2").val([[${userId}]]);
+            return confirm("수정하시겠습니까 ?");
+            // let data = {
+            //     "title" : $("#updateModalLabel").val(),
+            //     "content" : $("#updateModalBody").val(),
+            //     "uid" : [[${userId}]],
+            //     "date" : this.createDate
+            // }
+            // if(confirm("수정하시겠습니까 ?")) {
+            //     $.ajax({
+            //         type: "POST",
+            //         url: "/board/updateLetter",
+            //         data: JSON.stringify(data),
+            //         dataType: "json",
+            //         contentType: "application/json; charset=utf-8",
+            //         success: function(data) {
+            //             if(data == 1) {
+            //                 alert("수정완료")
+            //                 location.reload(true);
+            //             }else {
+            //                 alert("수정실패");
+            //             }
+            //         },
+            //         error: function (data) {
+            //             console.log(data);
+            //             alert("같은 증상이 반복되는 경우 이상범한테 전화주세요.");
+            //         },
+            //     })
+            // }
         }
         /* 게시글 삭제 */
         function deleteLetter(title, uid, date) {
@@ -106,10 +108,14 @@
         }
 
         /* 작성글 확인 */
-        function getBoard(title, content) {
+        function getBoard(title, content, fileName, filePath, fileSize) {
+            let imagePath = filePath + fileName;
+
             $("#exampleModalLabel").val(title);
             $("#exampleModalBody").text(content);
 
+            $("#downloadFile2").remove();
+            $("#imageBody2").append("<img src='" + imagePath + "' alt='" + fileSize + "' id='downloadFile2' width='200' height='200'>")
         }
 
         /* 회원정보 수정 모달 */
@@ -243,7 +249,7 @@
             }).open();
         }
 
-        /* 글쓰끼 저장 */
+        /* 글쓰기 저장 */
         function save() {
             $("#uid").val([[${userId}]]);
             return confirm("저장하시겠습니까 ?");
@@ -336,7 +342,7 @@
                 <tr>
                     <th scope="row">[[${listStat.count}]]</th>
                     <td>
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#myModal" th:onclick="getBoard([[${list.title}]], [[${list.content}]])">[[${list.title}]]</button>
+                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#myModal" th:onclick="getBoard([[${list.title}]], [[${list.content}]], [[${list.fileName}]], [[${list.filePath}]], [[${list.fileSize}]])">[[${list.title}]]</button>
                     </td>
                     <td>[[${list.uid}]]</td>
                     <td>[[${list.date}]]</td>
@@ -349,7 +355,7 @@
         </table>
         <button type="button" class="btn btn-danger float-right btn-sm" onclick="goBack()">뒤로가기</button>
     </div>
-    <!-- 게시글 확인 모달 -->
+    <!-- 게시글 확인 모달 ##-->
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -368,8 +374,8 @@
                         <label for="content">내용</label>
                         <textarea class="form-control" id="exampleModalBody" readonly></textarea>
                     </div>
-                    <div class="form-group">
-
+                    <div class="form-group" id="imageBody2">
+                        <!-- 이미지삽입부 -->
                     </div>
                 </div>
 
@@ -410,22 +416,7 @@
             </div>
         </div>
     </div>
-    <!--게시글 수정 모달-->
-<!--    <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">-->
-<!--        <div class="modal-dialog" role="document">-->
-<!--            <div class="modal-content">-->
-<!--                <div class="modal-header">-->
-<!--                    <input type="text" class="modal-title border-0" id="updateModalLabel">-->
-<!--                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
-<!--                        <span aria-hidden="true">&times;</span>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <textarea class="modal-body" id="updateModalBody"></textarea>-->
-<!--                <button type="button" class="btn btn-primary" onclick="updateLetter()">수정</button>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-    <!-- 게시글 수정 여기-->
+    <!-- 게시글 수정 -->
     <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -436,7 +427,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="/board/write" method="post" enctype="multipart/form-data" onsubmit="return updateLetter()">
+                    <form action="/board/updateLetter" method="post" enctype="multipart/form-data" onsubmit="return updateLetter()">
                         <div class="form-group">
                             <label for="updateModalLabel">제목</label>
                             <input type="text" class="form-control" id="updateModalLabel" name="title">
@@ -456,6 +447,7 @@
                             <button type="button" class="btn btn-primary" onclick="updateLetter()">수정</button>
                         </div>
                         <input type="hidden" name="uid" id="uid2">
+                        <input type="hidden" name="date" id="modifyDate">
                     </form>
                 </div>
             </div>

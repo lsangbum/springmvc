@@ -51,24 +51,9 @@ public class BoardController {
      * @return  성공 1 실패 0
      */
     @PostMapping("/write")
-    public ModelAndView setWrite(@ModelAttribute BoardList boardList, @Value("${spring.servlet.multipart.location}") String uploadFolder,
-                            ModelAndView mv) throws Exception {
-
-        /* uploadPath   = 업로드 폴더 경로 저장
-         * filePath     = 파일 저장 경로 설정
-         * destinationFile / transferTo(destinationFile) = 파일 저장
-         */
-        Path uploadPath = Paths.get(uploadFolder);
-        Path filePath = uploadPath.resolve(boardList.getFile().getOriginalFilename());
-        File destinationFile = new File(filePath.toString());
-        boardList.getFile().transferTo(destinationFile);
-
-        boardList.setFileName(boardList.getFile().getOriginalFilename());
-        boardList.setFilePath(uploadFolder + "/");
-        boardList.setFileSize(boardList.getFile().getSize());
-
-        boardService.setWrite(boardList);
-        mv.setViewName("redirect:/board/view");
+    public ModelAndView setWrite(@ModelAttribute BoardList boardList, ModelAndView mv) throws Exception {
+        boardService.setWrite(saveFile(boardList));     //업데이트 쿼리
+        mv.setViewName("redirect:/board/view");         //게시판 리다이렉트
 
         return mv;
     }
@@ -80,9 +65,13 @@ public class BoardController {
      * @return  성공 1 실패 0
      */
     @PostMapping("/updateLetter")
-    public Integer updateLetter(@RequestBody BoardList boardList) throws Exception  {
-        return boardService.updateLetter(boardList);
+    public ModelAndView updateLetter(@ModelAttribute BoardList boardList, ModelAndView mv) throws Exception  {
+        boardService.updateLetter(saveFile(boardList));
+        mv.setViewName("redirect:/board/view");
+
+        return mv;
     }
+
     /**
      * @writer  이상범
      * @date    230901
@@ -92,5 +81,27 @@ public class BoardController {
     @PostMapping("/deleteLetter")
     public Integer deleteLetter(@RequestBody BoardList boardList) throws Exception  {
         return boardService.deleteLetter(boardList);
+    }
+
+    /**
+     * @writer  이상범
+     * @date    230915
+     * @script  파일저장 공용모듈
+     * @return  boardList
+     */
+    public BoardList saveFile(BoardList boardList) throws Exception {
+        /* uploadPath   = 업로드 폴더 경로 저장
+         * filePath     = 파일 저장 경로 설정
+         * destinationFile / transferTo(destinationFile) = 파일 저장
+         */
+        Path uploadPath = Paths.get(boardList.getUploadFolder());
+        Path filePath = uploadPath.resolve(boardList.getFile().getOriginalFilename());
+        File destinationFile = new File(filePath.toString());
+        boardList.getFile().transferTo(destinationFile);
+
+        boardList.setFileName(boardList.getFile().getOriginalFilename());
+        boardList.setFilePath(boardList.getUploadFolder() + "/");
+        boardList.setFileSize(boardList.getFile().getSize());
+        return boardList;
     }
 }
