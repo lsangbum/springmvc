@@ -65,10 +65,11 @@
         WHERE   UID             =   #{userId}
     </update>
 
+    <!-- 가입정보가 없는 경우 0반환 -->
     <select id="loginChk" parameterType="String" resultType="map">
-        SELECT  PWD
+        SELECT  IFNULL(MAX(PWD), '0') AS PWD
         FROM    USER
-        WHERE   UID =   #{email};
+        WHERE   UID = #{email};
     </select>
 
 </mapper>

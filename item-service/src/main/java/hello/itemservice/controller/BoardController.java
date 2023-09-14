@@ -69,8 +69,10 @@ public class BoardController {
 
         boardService.setWrite(boardList);
         mv.setViewName("redirect:/board/view");
+
         return mv;
     }
+
     /**
      * @writer  이상범
      * @date    230901

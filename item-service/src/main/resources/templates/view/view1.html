@@ -35,14 +35,13 @@
         }
         /* 게시글 수정 모달 */
         function updateLetterModal(title, content, createDate, fileName, filePath, fileSize) {
-            let imagePath = "http://leesangbum-site.shop/images/upload/" + fileName;
+            let imagePath = filePath + fileName;
 
             $("#updateModalLabel").val(title);
             $("#updateModalBody").text(content);
 
             $("#downloadFile").remove();
             $("#imageBody").append("<img src='" + imagePath + "' alt='" + fileSize + "' id='downloadFile' width='200' height='200'>")
-
             this.createDate = createDate;
         }
         /* 게시글 수정 모달 */
