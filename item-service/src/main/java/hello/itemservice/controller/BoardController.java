@@ -27,6 +27,9 @@ public class BoardController {
      * @writer  이상범
      * @date    230830
      * @script  로그인 아이디세션저장 후 페이지이동
+     * 과제 1 : JWT 활용하여 stateless 상태로 변경해보기
+     * JWT는 session 과 다르게 그때그때 상태체크를 하지 않아도 되기에 메모리 활용도면에서 좋다.
+     * 단점으로는 JWT의 경우 session보다 많은 양의 데이터를 보관하여 체크하기에 노출 시 위험도가 크다.
      * @return  view/view1
      */
     @GetMapping("/view")
