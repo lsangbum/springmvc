@@ -41,7 +41,9 @@
             $("#updateModalBody").text(content);
 
             $("#downloadFile").remove();
-            $("#imageBody").append("<img src='" + imagePath + "' alt='" + fileSize + "' id='downloadFile' width='200' height='200'>")
+            if (!!fileName) {   //231209 등록된 파일이 없는 경우 해당 태그는 삽입하지 않는다.
+                $("#imageBody").append("<img src='" + imagePath + "' alt='" + fileSize + "' id='downloadFile' width='200' height='200'>");
+            }
             $("#modifyDate").val(createDate);
         }
         /* 게시글 수정 모달 */
@@ -115,7 +117,9 @@
             $("#exampleModalBody").text(content);
 
             $("#downloadFile2").remove();
-            $("#imageBody2").append("<img src='" + imagePath + "' alt='" + fileSize + "' id='downloadFile2' width='200' height='200'>")
+            if (!!fileName) {   //231209 등록된 파일이 없는 경우 해당 태그는 삽입하지 않는다.
+                $("#imageBody2").append("<img src='" + imagePath + "' alt='" + fileSize + "' id='downloadFile2' width='200' height='200'>")
+            }
         }
 
         /* 회원정보 수정 모달 */

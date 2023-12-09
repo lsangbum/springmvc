@@ -51,13 +51,16 @@ public class BoardController {
      * @writer  이상범
      * @date    230830
      * @script  게시판글쓰기 / 제목, 내용, 작성자
+     * @issue   231208 게시글 글쓰기 저장버튼 클릭 시 파일이 없으면 IOException null check 처리
      * @return  성공 1 실패 0
      */
     @PostMapping("/write")
     public ModelAndView setWrite(@ModelAttribute BoardList boardList,
                                  @Value("${spring.servlet.multipart.location}")String uploadFolder,
                                  ModelAndView mv) throws Exception {
-        boardService.setWrite(saveFile(boardList, uploadFolder));     //업데이트 쿼리
+        if (boardList.getFile().isEmpty()) boardService.setWrite(boardList);
+        else boardService.setWrite(saveFile(boardList, uploadFolder));     //업데이트 쿼리
+
         mv.setViewName("redirect:/board/view");         //게시판 리다이렉트
 
         return mv;
