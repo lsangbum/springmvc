@@ -1,5 +1,6 @@
 package hello.itemservice.scheduler;
 
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -28,10 +29,18 @@ public class testScheduler {
      * 프로젝트 실행 시 @Component에 의하여 해당 클레스가 Bean으로 등록되고
      * @EnableScheduling 어노테이션은 등록된 Bean 내 @Scheduled를 감지한다.
      */
-    @Scheduled(fixedRate = 1000, initialDelay = 5000)
+    @Scheduled(fixedRate = 5000, initialDelay = 5000)
+    @SchedulerLock(name = "test", lockAtMostFor = "30s", lockAtLeastFor = "1s")
     public void testPostsContainingSpecificText() {
         long time = System.currentTimeMillis();
-        System.out.println("test : " + time);
+        System.out.println("test1 : " + time);
+    }
+
+    @Scheduled(fixedRate = 5000, initialDelay = 5000)
+    @SchedulerLock(name = "test", lockAtMostFor = "30s", lockAtLeastFor = "1s")
+    public void testPostsContainingSpecificText2() {
+        long time = System.currentTimeMillis();
+        System.out.println("test2 : " + time);
     }
 
     /**
@@ -39,11 +48,11 @@ public class testScheduler {
      * cron 속성의 앞 숫자부터 초, 분, 시, 일, 월, 요일 을 나타내면 최대 6자리이다.
      * zone의 경우 입력하지 않는 경우 Default로 Local의 time zone으로 설정된다.
      */
-    @Scheduled(cron = "* * * * * *", zone = "Asis/Seoul")
-    public void testCronExpession() {
-        long time = System.currentTimeMillis();
-        System.out.println("test : " + time);
-    }
+//    @Scheduled(cron = "* * * * * *", zone = "Asis/Seoul")
+//    public void testCronExpession() {
+//        long time = System.currentTimeMillis();
+//        System.out.println("test : " + time);
+//    }
 
     /* cron 표현식 예제
     // 매일 18시에 실행
